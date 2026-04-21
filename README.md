@@ -1,36 +1,36 @@
 # mem0_oss — Self-Hosted Mem0 Memory Provider
 
-Плагин для [Hermes Agent](https://github.com/NousResearch/hermes-agent). Позволяет использовать **свой сервер Mem0 OSS** вместо облака Mem0 Platform.
+Plugin for [Hermes Agent](https://github.com/NousResearch/hermes-agent) that connects to a **self-hosted Mem0 OSS server** instead of Mem0 Platform (cloud).
 
 ---
 
-## Зачем
+## Why this exists
 
-Hermes уже имеет встроенный плагин `mem0`. Но он использует `mem0ai` SDK, который:
-- Требует API ключ Mem0 Platform
-- Игнорирует `MEM0_BASE_URL` — всегда стучится на `https://api.mem0.ai`
-- Вызывает эндпоинты `/v2/...` которых нет в self-hosted версии
+Hermes already has a built-in `mem0` plugin. But it uses the `mem0ai` SDK which:
+- Requires a Mem0 Platform API key
+- Ignores `MEM0_BASE_URL` — always connects to `https://api.mem0.ai`
+- Calls `/v2/...` endpoints that don't exist in self-hosted Mem0 OSS
 
-**Этот плагин** работает напрямую через REST API твоего сервера — без SDK, без облака.
-
----
-
-## Что умеет
-
-| Операция | Метод | Эндпоинт |
-|----------|-------|----------|
-| Поиск по памяти | `POST` | `/v1/memories/search/` |
-| Профиль пользователя | `GET` | `/v1/memories/?user_id={user_id}` |
-| Сохранить факт | `POST` | `/v1/memories/` |
-
-- Поиск с релевантностью и порогом
-- Тредобезопасный httpx клиент
-- Circuit breaker при сбоях
-- Фоновая синхронизация
+**This plugin** calls your Mem0 OSS server directly via REST — no SDK, no cloud, no API key needed for the server itself.
 
 ---
 
-## Установка
+## Features
+
+| Operation | Method | Endpoint |
+|-----------|--------|----------|
+| Search memories | `POST` | `/v1/memories/search/` |
+| User profile | `GET` | `/v1/memories/?user_id={user_id}` |
+| Store fact | `POST` | `/v1/memories/` |
+
+- Semantic search with relevance scores
+- Thread-safe httpx client
+- Circuit breaker on failures
+- Background sync
+
+---
+
+## Installation
 
 ```bash
 hermes plugins install DenSul/mem0-oss
@@ -38,16 +38,18 @@ hermes plugins install DenSul/mem0-oss
 
 ---
 
-## Настройка
+## Configuration
 
-В `~/.hermes/.env`:
+In `~/.hermes/.env`:
 
 ```env
 MEM0_BASE_URL=http://YOUR_MEM0_SERVER_IP:8420
-MEM0_API_KEY=любой_ключ
+MEM0_API_KEY=any_key
 MEM0_USER_ID=denis
 MEM0_AGENT_ID=hermes
 ```
+
+Then:
 
 ```bash
 hermes plugins enable mem0_oss
@@ -56,11 +58,11 @@ hermes gateway restart
 
 ---
 
-## Сервер Mem0 OSS
+## Mem0 OSS Server
 
-Текущий сервер: `http://YOUR_MEM0_SERVER_IP:8420`
+Current server: `http://YOUR_MEM0_SERVER_IP:8420`
 
-На сервере работает systemd-служба, uvicorn на порту 8420. Для перезапуска:
+The server runs under a systemd service. To restart:
 
 ```bash
 ssh root@YOUR_MEM0_SERVER_IP
@@ -70,16 +72,16 @@ journalctl -u mem0 -f
 
 ---
 
-## Структура репозитория
+## Repository Structure
 
 ```
 mem0-oss/
 ├── __init__.py    # Mem0OSSMemoryProvider
-└── plugin.yaml    # Манифест плагина
+└── plugin.yaml    # Plugin manifest
 ```
 
 ---
 
-## Лицензия
+## License
 
 MIT
